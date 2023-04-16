@@ -156,16 +156,21 @@
           "markdownDescription": "API key from [OpenAI](https://platform.openai.com/account/api-keys)",
           "order": 0
         },
+        "codegpt.endpoint": {
+          "type": "string",
+          "markdownDescription": "Azure open-ai endpoint",
+          "order": 0
+        },
         "codegpt.model": {
           "type": "string",
           "enum": [
-            "ChatGPT",
+            "gpt-35-turbo",
             "text-davinci-003",
             "text-curie-001",
             "code-davinci-002",
             "code-cushman-002"
           ],
-          "default": "text-davinci-003",
+          "default": "gpt-35-turbo",
           "description": "Which GPT3 model to use",
           "order": 1
         },
@@ -255,6 +260,6 @@
     "webpack-cli": "^5.0.0"
   },
   "dependencies": {
-    "openai": "^3.1.0"
+    "azure-openai": "^0.9.4"
   }
 }

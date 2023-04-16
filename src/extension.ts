@@ -1,10 +1,11 @@
 import * as vscode from 'vscode';
-import { Configuration, OpenAIApi } from 'openai';
+//import { Configuration, OpenAIApi } from 'openai';
+import { Configuration, OpenAIApi } from 'azure-openai';
 
 import createPrompt from './prompt';
 
 
-type AuthInfo = {apiKey?: string};
+type AuthInfo = {apiKey?: string, endpoint?: string};
 export type Settings = {selectedInsideCodeblock?: boolean, pasteOnClick?: boolean, model?: string, maxTokens?: number, temperature?: number};
 
 
@@ -17,7 +18,8 @@ export function activate(context: vscode.ExtensionContext) {
 	const config = vscode.workspace.getConfiguration('codegpt');
 	// Put configuration settings into the provider
 	provider.setAuthenticationInfo({
-		apiKey: config.get('apiKey')
+		apiKey: config.get('apiKey'),
+		endpoint: config.get('endpoint')
 	});
 
 	provider.setSettings({
@@ -60,7 +62,7 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.workspace.onDidChangeConfiguration((event: vscode.ConfigurationChangeEvent) => {
 		if (event.affectsConfiguration('codegpt.apiKey')) {
 			const config = vscode.workspace.getConfiguration('codegpt');
-			provider.setAuthenticationInfo({ apiKey: config.get('apiKey') });
+			provider.setAuthenticationInfo({ apiKey: config.get('apiKey'), endpoint: config.get('endpoint') });
 			console.log("API key changed");
 		} else if (event.affectsConfiguration('codegpt.selectedInsideCodeblock')) {
 			const config = vscode.workspace.getConfiguration('codegpt');
@@ -113,7 +115,12 @@ class CodeGPTViewProvider implements vscode.WebviewViewProvider {
 	// Set the session token and create a new API instance based on this token
 	public setAuthenticationInfo(authInfo: AuthInfo) {
 		this._apiKey = authInfo.apiKey;
-		this._apiConfiguration = new Configuration({apiKey: authInfo.apiKey});
+		this._apiConfiguration = new Configuration({
+			azure: {
+				apiKey: authInfo.apiKey,
+				endpoint: authInfo.endpoint
+			}
+		});
 		this._newAPI();
 	}
 
